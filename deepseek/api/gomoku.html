@@ -1,6 +1,15 @@
-# 五子棋游戏 HTML 实现
 
-以下是一个完整的五子棋游戏 HTML 实现，所有代码都在一个 HTML 文件中：
+# 五子棋游戏实现
+
+我将创建一个完整的五子棋游戏，包含棋盘、游戏逻辑和美观的界面设计。
+
+## 设计思路
+- 使用Canvas绘制棋盘和棋子
+- 实现游戏核心逻辑（落子、判断胜负、重新开始）
+- 添加美观的UI和交互效果
+- 响应式设计，适应不同屏幕尺寸
+
+## 最终实现代码
 
 ```html
 <!DOCTYPE html>
@@ -10,314 +19,417 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>五子棋游戏</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f5f5dc;
-            margin: 0;
             padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
         }
         
         h1 {
-            color: #8B4513;
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
-        .game-container {
+        .game-info {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
-        }
-        
-        .board {
-            display: grid;
-            grid-template-columns: repeat(15, 30px);
-            grid-template-rows: repeat(15, 30px);
-            background-color: #DEB887;
-            border: 2px solid #8B4513;
-            position: relative;
-        }
-        
-        .cell {
-            width: 30px;
-            height: 30px;
-            box-sizing: border-box;
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .cell::before, .cell::after {
-            content: '';
-            position: absolute;
-            background-color: #000;
-        }
-        
-        .cell::before {
-            width: 100%;
-            height: 1px;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-        }
-        
-        .cell::after {
-            width: 1px;
-            height: 100%;
-            left: 50%;
-            top: 0;
-            transform: translateX(-50%);
-        }
-        
-        .piece {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            z-index: 1;
-        }
-        
-        .black {
-            background: radial-gradient(circle at 30% 30%, #666, #000);
-            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-        }
-        
-        .white {
-            background: radial-gradient(circle at 30% 30%, #fff, #ccc);
-            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-        }
-        
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        
-        button {
-            padding: 8px 15px;
-            background-color: #8B4513;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #A0522D;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
         
         .status {
-            margin-top: 15px;
-            font-size: 18px;
+            font-size: 1.2rem;
             font-weight: bold;
-            color: #8B4513;
-            height: 24px;
         }
         
-        .star-point {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background-color: #000;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
+        .black-turn {
+            color: #000;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+        
+        .white-turn {
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+        }
+        
+        .game-board {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            background: #deb887;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .rules {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .rules h2 {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .rules ul {
+            list-style-position: inside;
+            padding-left: 10px;
+        }
+        
+        .rules li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            canvas {
+                width: 95vw;
+                height: 95vw;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>五子棋游戏</h1>
-    <div class="game-container">
-        <div class="status" id="status">黑方回合</div>
-        <div class="board" id="board"></div>
+    <div class="container">
+        <header>
+            <h1>五子棋游戏</h1>
+        </header>
+        
+        <div class="game-info">
+            <div class="status">当前回合: <span id="player-turn" class="black-turn">黑棋</span></div>
+            <div id="winner-text"></div>
+        </div>
+        
+        <div class="game-board">
+            <canvas id="chessboard" width="550" height="550"></canvas>
+        </div>
+        
         <div class="controls">
-            <button id="restart">重新开始</button>
-            <button id="undo">悔棋</button>
+            <button id="restart-btn">重新开始</button>
+            <button id="undo-btn">悔棋</button>
+        </div>
+        
+        <div class="rules">
+            <h2>游戏规则</h2>
+            <ul>
+                <li>黑棋先行，双方轮流在棋盘上放置棋子</li>
+                <li>任意一方在横向、纵向或对角线上连成五个或更多同色棋子即获胜</li>
+                <li>棋子只能下在空交叉点上</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const board = document.getElementById('board');
-            const statusDisplay = document.getElementById('status');
-            const restartButton = document.getElementById('restart');
-            const undoButton = document.getElementById('undo');
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('chessboard');
+            const ctx = canvas.getContext('2d');
+            const restartBtn = document.getElementById('restart-btn');
+            const undoBtn = document.getElementById('undo-btn');
+            const playerTurnEl = document.getElementById('player-turn');
+            const winnerTextEl = document.getElementById('winner-text');
             
-            const BOARD_SIZE = 15;
+            // 游戏状态
+            const boardSize = 15;
+            const cellSize = canvas.width / (boardSize + 1);
+            let board = [];
             let currentPlayer = 'black';
-            let gameActive = true;
-            let gameState = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
+            let gameOver = false;
             let moveHistory = [];
             
             // 初始化棋盘
-            function initializeBoard() {
-                board.innerHTML = '';
+            function initBoard() {
+                board = [];
+                for (let i = 0; i < boardSize; i++) {
+                    board[i] = [];
+                    for (let j = 0; j < boardSize; j++) {
+                        board[i][j] = null;
+                    }
+                }
+                currentPlayer = 'black';
+                gameOver = false;
+                moveHistory = [];
+                playerTurnEl.textContent = '黑棋';
+                playerTurnEl.className = 'black-turn';
+                winnerTextEl.textContent = '';
+                drawBoard();
+            }
+            
+            // 绘制棋盘
+            function drawBoard() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // 创建棋盘格子
-                for (let i = 0; i < BOARD_SIZE; i++) {
-                    for (let j = 0; j < BOARD_SIZE; j++) {
-                        const cell = document.createElement('div');
-                        cell.classList.add('cell');
-                        cell.dataset.row = i;
-                        cell.dataset.col = j;
-                        cell.addEventListener('click', handleCellClick);
-                        board.appendChild(cell);
+                // 绘制棋盘背景
+                ctx.fillStyle = '#deb887';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制网格线
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                
+                for (let i = 0; i < boardSize; i++) {
+                    // 横线
+                    ctx.beginPath();
+                    ctx.moveTo(cellSize, cellSize * (i + 1));
+                    ctx.lineTo(cellSize * boardSize, cellSize * (i + 1));
+                    ctx.stroke();
+                    
+                    // 竖线
+                    ctx.beginPath();
+                    ctx.moveTo(cellSize * (i + 1), cellSize);
+                    ctx.lineTo(cellSize * (i + 1), cellSize * boardSize);
+                    ctx.stroke();
+                }
+                
+                // 绘制天元和星位
+                const starPoints = [3, 7, 11];
+                ctx.fillStyle = '#000';
+                
+                for (let i of starPoints) {
+                    for (let j of starPoints) {
+                        ctx.beginPath();
+                        ctx.arc(cellSize * (i + 1), cellSize * (j + 1), 4, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
                 
-                // 添加星位点
-                const starPoints = [
-                    [3, 3], [3, 11], [3, 7],
-                    [11, 3], [11, 11], [11, 7],
-                    [7, 3], [7, 11], [7, 7]
-                ];
-                
-                starPoints.forEach(point => {
-                    const star = document.createElement('div');
-                    star.classList.add('star-point');
-                    star.style.left = `${(point[1] * 30) + 15}px`;
-                    star.style.top = `${(point[0] * 30) + 15}px`;
-                    board.appendChild(star);
-                });
+                // 绘制棋子
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (board[i][j]) {
+                            drawPiece(i, j, board[i][j]);
+                        }
+                    }
+                }
             }
             
-            // 处理格子点击
-            function handleCellClick(e) {
-                if (!gameActive) return;
+            // 绘制棋子
+            function drawPiece(row, col, color) {
+                ctx.beginPath();
+                ctx.arc(cellSize * (col + 1), cellSize * (row + 1), cellSize * 0.4, 0, Math.PI * 2);
                 
-                const row = parseInt(e.target.dataset.row);
-                const col = parseInt(e.target.dataset.col);
-                
-                // 如果该位置已有棋子，则不能下
-                if (gameState[row][col] !== null) return;
-                
-                // 记录这一步
-                moveHistory.push({row, col, player: currentPlayer});
-                
-                // 更新游戏状态
-                gameState[row][col] = currentPlayer;
-                
-                // 在棋盘上放置棋子
-                const piece = document.createElement('div');
-                piece.classList.add('piece', currentPlayer);
-                e.target.appendChild(piece);
-                
-                // 检查是否获胜
-                if (checkWin(row, col)) {
-                    statusDisplay.textContent = `${currentPlayer === 'black' ? '黑方' : '白方'}获胜！`;
-                    gameActive = false;
-                    return;
+                if (color === 'black') {
+                    ctx.fillStyle = '#000';
+                    ctx.fill();
+                    ctx.strokeStyle = '#888';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                } else {
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
                 }
+            }
+            
+            // 处理点击事件
+            function handleClick(e) {
+                if (gameOver) return;
                 
-                // 切换玩家
-                currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
-                statusDisplay.textContent = `${currentPlayer === 'black' ? '黑方' : '白方'}回合`;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // 计算点击的棋盘位置
+                const col = Math.round(x / cellSize - 1);
+                const row = Math.round(y / cellSize - 1);
+                
+                // 检查是否在有效范围内
+                if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
+                    // 检查位置是否为空
+                    if (board[row][col] === null) {
+                        // 放置棋子
+                        board[row][col] = currentPlayer;
+                        moveHistory.push({row, col, player: currentPlayer});
+                        drawBoard();
+                        
+                        // 检查胜负
+                        if (checkWin(row, col)) {
+                            gameOver = true;
+                            const winner = currentPlayer === 'black' ? '黑棋' : '白棋';
+                            winnerTextEl.textContent = `${winner}获胜！`;
+                        } else {
+                            // 切换玩家
+                            currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+                            playerTurnEl.textContent = currentPlayer === 'black' ? '黑棋' : '白棋';
+                            playerTurnEl.className = currentPlayer === 'black' ? 'black-turn' : 'white-turn';
+                        }
+                    }
+                }
             }
             
             // 检查是否获胜
             function checkWin(row, col) {
                 const directions = [
                     [0, 1],   // 水平
-                    [1, 0],    // 垂直
-                    [1, 1],    // 对角线
-                    [1, -1]    // 反对角线
+                    [1, 0],   // 垂直
+                    [1, 1],   // 右下
+                    [1, -1]   // 右上
                 ];
+                
+                const currentColor = board[row][col];
                 
                 for (const [dx, dy] of directions) {
                     let count = 1;
                     
                     // 正向检查
-                    for (let i = 1; i <= 4; i++) {
+                    for (let i = 1; i < 5; i++) {
                         const newRow = row + i * dx;
                         const newCol = col + i * dy;
                         
-                        if (newRow < 0 || newRow >= BOARD_SIZE || newCol < 0 || newCol >= BOARD_SIZE) break;
-                        if (gameState[newRow][newCol] !== currentPlayer) break;
+                        if (newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize || board[newRow][newCol] !== currentColor) {
+                            break;
+                        }
                         
                         count++;
                     }
                     
                     // 反向检查
-                    for (let i = 1; i <= 4; i++) {
+                    for (let i = 1; i < 5; i++) {
                         const newRow = row - i * dx;
                         const newCol = col - i * dy;
                         
-                        if (newRow < 0 || newRow >= BOARD_SIZE || newCol < 0 || newCol >= BOARD_SIZE) break;
-                        if (gameState[newRow][newCol] !== currentPlayer) break;
+                        if (newRow < 0 || newRow >= boardSize || newCol < 0 || newCol >= boardSize || board[newRow][newCol] !== currentColor) {
+                            break;
+                        }
                         
                         count++;
                     }
                     
-                    if (count >= 5) return true;
+                    if (count >= 5) {
+                        return true;
+                    }
                 }
                 
                 return false;
             }
             
-            // 重新开始游戏
-            function restartGame() {
-                gameState = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
-                currentPlayer = 'black';
-                gameActive = true;
-                moveHistory = [];
-                statusDisplay.textContent = '黑方回合';
-                initializeBoard();
-            }
-            
-            // 悔棋
+            // 悔棋功能
             function undoMove() {
-                if (moveHistory.length === 0 || !gameActive) return;
+                if (gameOver || moveHistory.length === 0) return;
                 
+                // 移除最后一步
                 const lastMove = moveHistory.pop();
-                gameState[lastMove.row][lastMove.col] = null;
+                board[lastMove.row][lastMove.col] = null;
                 
-                const cell = document.querySelector(`[data-row="${lastMove.row}"][data-col="${lastMove.col}"]`);
-                cell.innerHTML = '';
+                // 如果还有更多步骤，切换玩家
+                if (moveHistory.length > 0) {
+                    const prevMove = moveHistory[moveHistory.length - 1];
+                    currentPlayer = prevMove.player === 'black' ? 'white' : 'black';
+                } else {
+                    currentPlayer = 'black';
+                }
                 
-                currentPlayer = lastMove.player;
-                statusDisplay.textContent = `${currentPlayer === 'black' ? '黑方' : '白方'}回合`;
+                playerTurnEl.textContent = currentPlayer === 'black' ? '黑棋' : '白棋';
+                playerTurnEl.className = currentPlayer === 'black' ? 'black-turn' : 'white-turn';
+                winnerTextEl.textContent = '';
+                
+                drawBoard();
             }
             
             // 事件监听
-            restartButton.addEventListener('click', restartGame);
-            undoButton.addEventListener('click', undoMove);
+            canvas.addEventListener('click', handleClick);
+            restartBtn.addEventListener('click', initBoard);
+            undoBtn.addEventListener('click', undoMove);
             
             // 初始化游戏
-            initializeBoard();
+            initBoard();
         });
     </script>
 </body>
 </html>
 ```
 
-## 游戏功能说明
+## 功能说明
 
-1. **基本规则**：
-   - 15×15 标准五子棋棋盘
-   - 黑方先行，轮流下子
-   - 先形成五子连线者获胜
+1. **游戏界面**：
+   - 15×15标准五子棋棋盘
+   - 显示当前玩家和获胜信息
+   - 重新开始和悔棋按钮
+   - 游戏规则说明
 
-2. **游戏特性**：
-   - 显示当前回合玩家
-   - 获胜时显示获胜方
-   - 重新开始按钮
+2. **游戏功能**：
+   - 黑白棋轮流落子
+   - 自动判断胜负（横向、纵向、对角线五子连珠）
    - 悔棋功能
+   - 重新开始游戏
 
 3. **界面设计**：
-   - 木质风格的棋盘
-   - 黑白棋子有立体效果
-   - 标出了传统五子棋的星位点
+   - 渐变背景和半透明棋盘区域
+   - 响应式设计，适应不同屏幕尺寸
+   - 棋子有立体感效果
+   - 交互按钮有悬停效果
 
-4. **技术实现**：
-   - 纯 HTML/CSS/JavaScript 实现
-   - 使用 CSS Grid 布局棋盘
-   - 使用二维数组跟踪游戏状态
-   - 实现四方向获胜检查算法
-
-您可以将此代码保存为单个 HTML 文件，然后在浏览器中打开即可开始游戏。
+您可以直接复制上面的代码到一个HTML文件中，然后在浏览器中打开即可开始游戏。
